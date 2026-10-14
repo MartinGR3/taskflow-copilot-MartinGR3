@@ -195,6 +195,23 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.status").value(404));
     }
 
+    @Test
+    void getTasksUnassigned_retorna200YListaConAssigneeNull() throws Exception {
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        try {
+            Task t4 = new Task(4L, "Escribir tests MockMvc", "desc", TaskStatus.TODO, Priority.MED, 1L, null, hoy.plusDays(7));
+            when(taskService.sinResponsable()).thenReturn(java.util.List.of(t4));
+
+            mockMvc.perform(get("/tasks/unassigned"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1))
+                    .andExpect(jsonPath("$[0].id").value(4))
+                    .andExpect(jsonPath("$[0].assigneeId").value(org.hamcrest.Matchers.nullValue()));
+        } catch (TaskValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     // ---- helpers de datos (reales, no mocks) ----
 
     private Task tarea(Long id, String title, TaskStatus status) {

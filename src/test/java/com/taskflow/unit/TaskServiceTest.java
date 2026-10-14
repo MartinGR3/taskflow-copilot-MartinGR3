@@ -179,6 +179,39 @@ class TaskServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("SinResponsable")
+    class SinResponsable {
+        @Test
+        void ordenaCorrectamente() {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            try {
+                Task t10 = new Task(10L, "Con fecha 10", "desc", TaskStatus.TODO, Priority.MED, PROYECTO, null, hoy.plusDays(10));
+                Task conAssignee = new Task(11L, "Con responsable", "desc", TaskStatus.TODO, Priority.MED, PROYECTO, 5L, hoy.plusDays(5));
+                Task sinFecha = new Task(12L, "Sin fecha", "desc", TaskStatus.TODO, Priority.MED, PROYECTO, null, null);
+                Task t2 = new Task(13L, "Con fecha 2", "desc", TaskStatus.TODO, Priority.MED, PROYECTO, null, hoy.plusDays(2));
+                when(repository.findAll()).thenReturn(java.util.List.of(t10, conAssignee, sinFecha, t2));
+
+                java.util.List<Task> res = service.sinResponsable();
+
+                java.util.List<Long> ids = res.stream().map(Task::getId).toList();
+                org.junit.jupiter.api.Assertions.assertEquals(java.util.List.of(13L, 10L, 12L), ids);
+            } catch (TaskValidationException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        @Test
+        void devuelveVacioSiTodasAsignadas() {
+            Task t1 = tarea(1L, "Con responsable", 5L);
+            when(repository.findAll()).thenReturn(java.util.List.of(t1));
+
+            java.util.List<Task> res = service.sinResponsable();
+
+            org.junit.jupiter.api.Assertions.assertTrue(res.isEmpty());
+        }
+    }
+
     /** Fabrica una Task de rehidratación REAL (dato, no mock). assigneeId null = sin responsable. */
     private Task tarea(Long id, String title, Long assigneeId) {
         try {

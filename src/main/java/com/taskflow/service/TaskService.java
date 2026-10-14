@@ -133,4 +133,15 @@ public class TaskService {
                 .sorted(TaskOrders.POR_FECHA)
                 .toList();
     }
+
+    /**
+     * Lista las tareas sin responsable de todos los proyectos: reutiliza el predicado
+     * ReportService.SIN_ASIGNAR y ordena por TaskOrders.POR_FECHA.
+     */
+    public List<Task> sinResponsable() {
+        return repository.findAll().stream()
+                .filter(ReportService.SIN_ASIGNAR)
+                .sorted(TaskOrders.POR_FECHA)
+                .toList();
+    }
 }
