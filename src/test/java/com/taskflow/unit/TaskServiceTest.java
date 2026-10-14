@@ -155,6 +155,30 @@ class TaskServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("vencidas")
+    class Vencidas {
+        @Test
+        void vencidas_filtraSoloVencidasYOrdena() {
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            try {
+                Task t1 = new Task(1L, "Antigua", "desc", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, hoy.minusDays(5));
+                Task t2 = new Task(2L, "Reciente", "desc", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, hoy.minusDays(1));
+                Task done = new Task(3L, "Hecha", "desc", TaskStatus.DONE, Priority.MED, PROYECTO, 1L, hoy.minusDays(10));
+                Task sinFecha = new Task(4L, "SinFecha", "desc", TaskStatus.IN_PROGRESS, Priority.MED, PROYECTO, 1L, null);
+                when(repository.findAll()).thenReturn(java.util.List.of(t2, done, sinFecha, t1));
+
+                java.util.List<Task> res = service.vencidas();
+
+                org.junit.jupiter.api.Assertions.assertEquals(2, res.size());
+                org.junit.jupiter.api.Assertions.assertEquals(t1, res.get(0));
+                org.junit.jupiter.api.Assertions.assertEquals(t2, res.get(1));
+            } catch (TaskValidationException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
     /** Fabrica una Task de rehidratación REAL (dato, no mock). assigneeId null = sin responsable. */
     private Task tarea(Long id, String title, Long assigneeId) {
         try {

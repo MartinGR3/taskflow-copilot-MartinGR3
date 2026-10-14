@@ -89,6 +89,24 @@ class TaskControllerTest {
     }
 
     @Test
+    void getTasksOverdue_retorna200YListaEnOrden() throws Exception {
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        try {
+            Task t7 = new Task(7L, "Corregir bug de fechas", "desc", TaskStatus.IN_PROGRESS, Priority.MED, 1L, 1L, hoy.minusDays(1));
+            Task t9 = new Task(9L, "Otra atrasada", "desc", TaskStatus.IN_PROGRESS, Priority.MED, 1L, 1L, hoy.minusDays(2));
+            when(taskService.vencidas()).thenReturn(java.util.List.of(t9, t7));
+
+                        mockMvc.perform(get("/tasks/overdue"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[0].title").value("Otra atrasada"))
+                    .andExpect(jsonPath("$[1].title").value("Corregir bug de fechas"));
+        } catch (TaskValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     void getTaskPorId_existente_retorna200ConElTitulo() throws Exception {
         when(taskService.buscarPorId(1L)).thenReturn(Optional.of(tarea(1L, "Diseñar esquema de BD", TaskStatus.TODO)));
 
