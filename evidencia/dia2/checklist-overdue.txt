@@ -1,0 +1,35 @@
+ specs/overdue.md                                   | 42 ++++++++++++++++++++++
+ .../com/taskflow/controller/TaskController.java    |  9 +++++
+ .../java/com/taskflow/service/TaskService.java     | 11 ++++++
+ .../com/taskflow/slice/TaskControllerTest.java     | 18 ++++++++++
+ .../java/com/taskflow/unit/TaskServiceTest.java    | 24 +++++++++++++
+ 5 files changed, 104 insertions(+)
+18	0	src/test/java/com/taskflow/slice/TaskControllerTest.java
+24	0	src/test/java/com/taskflow/unit/TaskServiceTest.java
+
++    /** GET /tasks/overdue — lista tareas vencidas de todos los proyectos. */
++    /**
++     * Lista las tareas vencidas de todos los proyectos: usa la regla del dominio Task.estaVencida()
++     * y las ordena por fecha ascendente con TaskOrders.POR_FECHA.
++     */
+
+MUTANTE: quitado .sorted(TaskOrders.POR_FECHA) de vencidas()
+
+[ERROR] Tests run: 8, Failures: 1, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+RESTAURADO: TaskService.java quedó exactamente como estaba.
+
+
++                    .andExpect(jsonPath("$[1].title").value("Corregir bug de fechas"));
+
+
++            description = "Lista tareas cuya Task.estaVencida() es true, ordenadas por dueDate asc.")
++     * Lista las tareas vencidas de todos los proyectos: usa la regla del dominio Task.estaVencida()
++     * y las ordena por fecha ascendente con TaskOrders.POR_FECHA.
++                .filter(Task::estaVencida)
++                .sorted(TaskOrders.POR_FECHA)
+
+
+[INFO] Tests run: 69, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
