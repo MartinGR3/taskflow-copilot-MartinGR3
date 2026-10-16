@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import com.taskflow.model.TaskStatus;
 
 /**
  * ProjectService — la capa de negocio del lado Project. Cero HTTP aquí (el "no existe" se traduce con
@@ -98,5 +99,27 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectNotFoundException(id));
         tareasDe(id).forEach(t -> taskRepository.deleteById(t.getId()));   // cascada manual (la FK obliga el orden)
         projectRepository.deleteById(id);
+    }
+
+    /**
+     * Calcula el resumen del proyecto: conteo por estado (siempre las tres claves) y tareas vencidas.
+     * Recibe la entidad Project ya encontrada (el controller decide 404).
+     */
+    public com.taskflow.dto.ProjectSummaryResponse resumenDe(Project project) {
+        List<Task> tareas = taskRepository.findByProjectId(project.getId());
+        int total = tareas.size();
+        java.util.Map<String, Integer> byStatus = new java.util.LinkedHashMap<>();
+        byStatus.put(TaskStatus.TODO.name(), 0);
+        byStatus.put(TaskStatus.IN_PROGRESS.name(), 0);
+        byStatus.put(TaskStatus.DONE.name(), 0);
+        int overdue = 0;
+        for (Task t : tareas) {
+            String key = t.getStatus().name();
+            byStatus.put(key, byStatus.getOrDefault(key, 0) + 1);
+            if (t.estaVencida()) {
+                overdue++;
+            }
+        }
+        return com.taskflow.mapper.ProjectSummaryMapper.aResponse(project, total, byStatus, overdue);
     }
 }
