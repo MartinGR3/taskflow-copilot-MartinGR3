@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.taskflow.dto.ProjectSummaryResponse;
+
 import java.net.URI;
 import java.util.List;
 
@@ -84,6 +86,15 @@ public class ProjectController {
             tareas = tareas.stream().filter(t -> t.getStatus() == status).toList();
         }
         return tareas.stream().map(TaskMapper::aResponse).toList();
+    }
+
+    @Operation(summary = "Resumen de un proyecto",
+            description = "Devuelve el conteo de tareas por estado y cuántas están vencidas.")
+    @GetMapping("/projects/{id}/summary")
+    public ProjectSummaryResponse getProjectSummary(@PathVariable("id") Long id) {
+        Project proyecto = projectService.buscarPorId(id)
+                .orElseThrow(() -> new ProjectNotFoundException(id));
+        return projectService.resumenDe(proyecto);
     }
 
     /**
