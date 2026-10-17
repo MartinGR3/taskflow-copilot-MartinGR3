@@ -37,7 +37,7 @@ index 2b5389e..fe7b851 100644
      @Operation(summary = "Lista tareas vencidas",
              description = "Lista tareas cuya Task.estaVencida() es true, ordenadas por dueDate asc.")
 diff --git a/src/main/java/com/taskflow/security/ProjectSecurity.java b/src/main/java/com/taskflow/security/ProjectSecurity.java
-index d04fe4c..fa1f9d0 100644
+index d04fe4c..050d24d 100644
 --- a/src/main/java/com/taskflow/security/ProjectSecurity.java
 +++ b/src/main/java/com/taskflow/security/ProjectSecurity.java
 @@ -35,7 +35,12 @@ public class ProjectSecurity {
@@ -46,9 +46,9 @@ index d04fe4c..fa1f9d0 100644
      public boolean esOwner(Long projectId, String username) {
 -        return projectRepository.findById(projectId)
 +        if (projectId == null) {
-+            // Si el id es null, no llamamos al repositorio para evitar excepciones en la evaluación de SpEL.
-+            // Devolver true deja hablar al servicio (404) como en el caso de proyecto inexistente.
-+            return true;
++            // Si el id es null, no autorizamos: un null no es un id válido para comprobar propiedad.
++            // Devolver false evita conceder permisos cuando no hay identificador para verificar.
++            return false;
 +        }
 +        boolean result = projectRepository.findById(projectId)
                  .map(proyecto -> {
@@ -87,10 +87,10 @@ index e0183c8..b8e440d 100644
  }
 diff --git a/src/test/java/com/taskflow/slice/BusquedaTareasControllerTest.java b/src/test/java/com/taskflow/slice/BusquedaTareasControllerTest.java
 new file mode 100644
-index 0000000..c8472a2
+index 0000000..3a3592e
 --- /dev/null
 +++ b/src/test/java/com/taskflow/slice/BusquedaTareasControllerTest.java
-@@ -0,0 +1,70 @@
+@@ -0,0 +1,72 @@
 +package com.taskflow.slice;
 +
 +import com.taskflow.controller.TaskController;
@@ -146,7 +146,9 @@ index 0000000..c8472a2
 +                    .andExpect(status().isOk())
 +                    .andExpect(jsonPath("$.length()").value(2))
 +                    .andExpect(jsonPath("$[0].id").value(9))
-+                    .andExpect(jsonPath("$[0].title").value("Documentar la API con Swagger"));
++                    .andExpect(jsonPath("$[0].title").value("Documentar la API con Swagger"))
++                    .andExpect(jsonPath("$[1].id").value(5))
++                    .andExpect(jsonPath("$[1].title").value("Optimizar consultas de la API"));
 +        } catch (TaskValidationException e) {
 +            throw new RuntimeException(e);
 +        }
@@ -163,7 +165,7 @@ index 0000000..c8472a2
 +}
 diff --git a/src/test/java/com/taskflow/unit/BusquedaTareasServiceTest.java b/src/test/java/com/taskflow/unit/BusquedaTareasServiceTest.java
 new file mode 100644
-index 0000000..f714c18
+index 0000000..9ad0b4a
 --- /dev/null
 +++ b/src/test/java/com/taskflow/unit/BusquedaTareasServiceTest.java
 @@ -0,0 +1,54 @@
@@ -218,6 +220,6 @@ index 0000000..f714c18
 +        assertThrows(TaskValidationException.class, () -> service.buscarPorTitulo(null));
 +        assertThrows(TaskValidationException.class, () -> service.buscarPorTitulo("   "));
 +        // repository nunca se llama en estos casos
-+        org.mockito.Mockito.verify(repo, org.mockito.Mockito.never()).findByTitleContainingIgnoreCase(org.mockito.Mockito.anyString());
++        org.mockito.Mockito.verifyNoInteractions(repo);
 +    }
 +}

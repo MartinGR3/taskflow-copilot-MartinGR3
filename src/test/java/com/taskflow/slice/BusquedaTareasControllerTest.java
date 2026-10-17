@@ -53,7 +53,9 @@ class BusquedaTareasControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.length()").value(2))
                     .andExpect(jsonPath("$[0].id").value(9))
-                    .andExpect(jsonPath("$[0].title").value("Documentar la API con Swagger"));
+                    .andExpect(jsonPath("$[0].title").value("Documentar la API con Swagger"))
+                    .andExpect(jsonPath("$[1].id").value(5))
+                    .andExpect(jsonPath("$[1].title").value("Optimizar consultas de la API"));
         } catch (TaskValidationException e) {
             throw new RuntimeException(e);
         }

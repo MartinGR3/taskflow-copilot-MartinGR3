@@ -36,9 +36,9 @@ public class ProjectSecurity {
      */
     public boolean esOwner(Long projectId, String username) {
         if (projectId == null) {
-            // Si el id es null, no llamamos al repositorio para evitar excepciones en la evaluación de SpEL.
-            // Devolver true deja hablar al servicio (404) como en el caso de proyecto inexistente.
-            return true;
+            // Si el id es null, no autorizamos: un null no es un id válido para comprobar propiedad.
+            // Devolver false evita conceder permisos cuando no hay identificador para verificar.
+            return false;
         }
         boolean result = projectRepository.findById(projectId)
                 .map(proyecto -> {

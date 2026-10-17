@@ -49,6 +49,6 @@ class BusquedaTareasServiceTest {
         assertThrows(TaskValidationException.class, () -> service.buscarPorTitulo(null));
         assertThrows(TaskValidationException.class, () -> service.buscarPorTitulo("   "));
         // repository nunca se llama en estos casos
-        org.mockito.Mockito.verify(repo, org.mockito.Mockito.never()).findByTitleContainingIgnoreCase(org.mockito.Mockito.anyString());
+        org.mockito.Mockito.verifyNoInteractions(repo);
     }
 }
