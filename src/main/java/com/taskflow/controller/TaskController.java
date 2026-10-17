@@ -72,6 +72,20 @@ public class TaskController {
         return tareas.stream().map(TaskMapper::aResponse).toList();
     }
 
+    /**
+     * GET /tasks/search?q= — busca tareas cuyo título contiene q (case-insensitive). q se recibe
+     * con required = false para que la validación la haga el servicio (lanza
+     * TaskValidationException -> advice -> 400 con el ErrorResponse uniforme).
+     */
+    @Operation(summary = "Busca tareas por título",
+            description = "Busca tareas cuyo título contiene el parámetro q (case-insensitive).")
+    @GetMapping("/tasks/search")
+    public List<TaskResponse> searchTasks(@RequestParam(name = "q", required = false) String q)
+            throws TaskValidationException {
+        List<Task> tareas = taskService.buscarPorTitulo(q);
+        return tareas.stream().map(TaskMapper::aResponse).toList();
+    }
+
     /** GET /tasks/overdue — lista tareas vencidas de todos los proyectos. */
     @Operation(summary = "Lista tareas vencidas",
             description = "Lista tareas cuya Task.estaVencida() es true, ordenadas por dueDate asc.")
