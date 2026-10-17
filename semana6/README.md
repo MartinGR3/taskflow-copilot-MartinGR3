@@ -1,6 +1,6 @@
 # Proyecto final · Semana 6 · GitHub Copilot
 
-**Alumno:** `Martin Gonzalez Rico` · **Usuario de GitHub:** `MartingGR3`
+**Alumno:** `Martin Gonzalez Rico` · **Usuario de GitHub:** `MartinGR3`
 
 ## 1. Qué construí
 
@@ -29,9 +29,12 @@
 
 | # | Qué hizo mal el agente (archivo) | Quién lo detectó | Cómo quedó corregido |
 |---|---|---|---|
-| 1 | `Se añadió un caso especial para projectId == null en ProjectSecurity.java, fuera del alcance de search.` | `Copilot code review` | `Se revisó la autorización y se mantuvo el rechazo del identificador nulo. Verificar el diff para confirmar si quedó restaurado el comportamiento original.`
+| 1 | `Se añadió un caso especial para projectId == null en ProjectSecurity.java, fuera del alcance de search.` | `Copilot code review` | `Regresé ProjectController.java y ProjectSecurity.java a su versión de 50e3ce9 (git checkout 50e3ce9 -- …) en el commit cb370a5. mvn clean test pasa los 80 tests.`
 | 2 | `El test no comprobaba que el repositorio no recibiera interacciones ante entradas inválidas (BusquedaTareasServiceTest.java).` | `Copilot code review` | `Se sustituyó la verificación por verifyNoInteractions(repo).`
-| 3 | `El test del controlador solo validaba los datos del primer elemento (BusquedaTareasControllerTest.java).` | `Se añadieron aserciones para el ID y título del segundo elemento.`
+| 3 | `El test del controlador solo validaba los datos del primer elemento (BusquedaTareasControllerTest.java).` | `Copilot code review` |`Se añadieron aserciones para el ID y título del segundo elemento.`
+| 4	|`Cambió #id por #a0 en el @PreAuthorize de ProjectController.java, fuera del alcance de la spec.`	| `revisor`	| `Revertido en el commit cb370a5 (versión de 50e3ce9).`
+| 5 |	`Añadió System.out.println de depuración y el if de projectId == null en ProjectSecurity.java, fuera del alcance.` |	`revisor` |	`Revertido en el commit cb370a5 (versión de 50e3ce9).`
+| 6 |	`Faltaba verify(repo, never()) para q null y "   " en BusquedaTareasServiceTest.java (lo exige la spec).`	| `revisor` |	`Agregado en el commit 99c3112.`
 
 **Lo que el agente hizo bien a la primera** (una o dos líneas): `El agente reutilizó el repositorio y el mapper existentes para implementar la búsqueda por título, incluyendo el recorte de espacios y el orden alfabético. La funcionalidad quedó cubierta con tests unitarios y de controlador.`
 
