@@ -35,13 +35,23 @@ public class ProjectSecurity {
      * borrar algo que no existe"). El "no encontrado" lo decide la capa de negocio, no la de seguridad.
      */
     public boolean esOwner(Long projectId, String username) {
-        return projectRepository.findById(projectId)
+        if (projectId == null) {
+            // Si el id es null, no llamamos al repositorio para evitar excepciones en la evaluación de SpEL.
+            // Devolver true deja hablar al servicio (404) como en el caso de proyecto inexistente.
+            System.out.println("ProjectSecurity.esOwner -> projectId is null, returning true");
+            return true;
+        }
+        boolean result = projectRepository.findById(projectId)
                 .map(proyecto -> {
                     Long userId = userRepository.findByUsername(username)
                             .map(User::getId)
                             .orElse(null);
-                    return proyecto.getOwnerId().equals(userId);
+                    boolean r = proyecto.getOwnerId().equals(userId);
+                    System.out.println("ProjectSecurity.esOwner -> projectId=" + projectId + ", username=" + username + ", ownerId=" + proyecto.getOwnerId() + ", userId=" + userId + ", result=" + r);
+                    return r;
                 })
                 .orElse(true);   // proyecto inexistente -> deja hablar al 404 del servicio
+        System.out.println("ProjectSecurity.esOwner -> final result for projectId=" + projectId + ": " + result);
+        return result;
     }
 }
