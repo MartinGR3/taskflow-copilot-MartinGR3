@@ -35,12 +35,7 @@ public class ProjectSecurity {
      * borrar algo que no existe"). El "no encontrado" lo decide la capa de negocio, no la de seguridad.
      */
     public boolean esOwner(Long projectId, String username) {
-        if (projectId == null) {
-            // Si el id es null, no autorizamos: un null no es un id válido para comprobar propiedad.
-            // Devolver false evita conceder permisos cuando no hay identificador para verificar.
-            return false;
-        }
-        boolean result = projectRepository.findById(projectId)
+        return projectRepository.findById(projectId)
                 .map(proyecto -> {
                     Long userId = userRepository.findByUsername(username)
                             .map(User::getId)
@@ -48,6 +43,5 @@ public class ProjectSecurity {
                     return proyecto.getOwnerId().equals(userId);
                 })
                 .orElse(true);   // proyecto inexistente -> deja hablar al 404 del servicio
-        return result;
     }
 }

@@ -136,7 +136,7 @@ public class ProjectController {
      */
     @Operation(summary = "Borra un proyecto y sus tareas",
             description = "Solo ADMIN o el owner. Un USER no-owner recibe 403.")
-    @PreAuthorize("hasRole('ADMIN') or @projectSecurity.esOwner(#a0, authentication.name)")
+    @PreAuthorize("hasRole('ADMIN') or @projectSecurity.esOwner(#id, authentication.name)")
     @DeleteMapping("/projects/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable("id") Long id) {
         projectService.eliminar(id);
